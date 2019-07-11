@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".newversion.TestActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <!--<Button-->
+        <!--android:id="@+id/btn_scale_big"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="放大"/>-->
+
+        <!--<Button-->
+        <!--android:id="@+id/btn_scale_small"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="缩小"/>-->
+
+        <!--<Button-->
+        <!--android:id="@+id/btn_translate_x"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="左移"/>-->
+
+        <!--<Button-->
+        <!--android:id="@+id/btn_translate_y"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="上移"/>-->
+
+        <Button
+            android:id="@+id/btn_undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="撤销"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"/>
+
+</LinearLayout>

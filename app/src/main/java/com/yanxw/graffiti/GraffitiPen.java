@@ -10,7 +10,7 @@ import android.graphics.Paint;
 
 public class GraffitiPen {
 
-    private static final int DEFAULT_SIZE = 20;
+    private static final int DEFAULT_SIZE = 5;
 
     public static final int COLOR_RED = Color.parseColor("#fb4455");
 
@@ -19,12 +19,11 @@ public class GraffitiPen {
 
     public GraffitiPen(int color) {
         mColor = color;
-        mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(DEFAULT_SIZE);
         mPaint.setColor(color);
 
-        mPaint.setAntiAlias(true);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }

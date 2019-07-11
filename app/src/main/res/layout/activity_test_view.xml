@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TestViewActivity">
+
+    <com.yanxw.graffiti.TestView
+        android:id="@+id/tv_test"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/edt_scale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:hint="scale"/>
+
+        <EditText
+            android:id="@+id/edt_translate_x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:hint="translate_x"/>
+
+        <EditText
+            android:id="@+id/edt_translate_y"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:hint="translate_y"/>
+
+        <EditText
+            android:id="@+id/edt_center_x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:hint="center_x"/>
+
+        <EditText
+            android:id="@+id/edt_center_y"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:hint="center_y"/>
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="确认"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

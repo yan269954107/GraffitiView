@@ -2,7 +2,9 @@ package com.yanxw.graffiti;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 
 import java.util.Stack;
 
@@ -21,17 +23,25 @@ public class Graffiti {
     private Canvas mGraffitiCanvas;
     private Bitmap mGraffitiBitmap;
 
+    private Bitmap mSrcBitmap;
+
     public Graffiti() {
         mPen = new GraffitiPen(GraffitiPen.COLOR_RED);
     }
 
     public void init(Bitmap srcBitmap) {
-        mGraffitiBitmap = srcBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        mSrcBitmap = srcBitmap;
+//        mGraffitiBitmap = srcBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        mGraffitiBitmap = Bitmap.createBitmap(mSrcBitmap.getWidth(), mSrcBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         mGraffitiCanvas = new Canvas(mGraffitiBitmap);
     }
 
     public void draw() {
         if (mCurrentPath != null) {
+            mGraffitiCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            for (Path path : mPathStack) {
+                mGraffitiCanvas.drawPath(path, mPen.getPaint());
+            }
             mGraffitiCanvas.drawPath(mCurrentPath, mPen.getPaint());
         }
     }
@@ -52,6 +62,16 @@ public class Graffiti {
         //贝塞尔曲线
         if (mCurrentPath != null) {
             mCurrentPath.quadTo(quadParams.x1, quadParams.y1, quadParams.x2, quadParams.y2);
+        }
+    }
+
+    public void actionUp() {
+        mGraffitiBitmap.recycle();
+        mGraffitiBitmap = null;
+        mGraffitiBitmap = Bitmap.createBitmap(mSrcBitmap.getWidth(), mSrcBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        mGraffitiCanvas = new Canvas(mGraffitiBitmap);
+        for (Path path : mPathStack) {
+            mGraffitiCanvas.drawPath(path, mPen.getPaint());
         }
     }
 

@@ -3,6 +3,7 @@ package com.yanxw.graffiti;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -55,6 +56,7 @@ public class GraffitiView extends View {
     private void init(Context context) {
         mContext = context;
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        mPaint.setColor(Color.BLACK);
         mGraffiti = new Graffiti();
         mCoordinate = new GraffitiCoordinate();
     }
@@ -87,8 +89,9 @@ public class GraffitiView extends View {
 
         canvas.scale(scale, scale);
 
+        canvas.drawBitmap(mPicBitmap, drawParams.left, drawParams.top, mPaint);
         mGraffiti.draw();
-        canvas.drawBitmap(mGraffiti.getGraffitiBitmap(), drawParams.left, drawParams.top, mPaint);
+        canvas.drawBitmap(mGraffiti.getGraffitiBitmap(), drawParams.left, drawParams.top, null);
         Log.d("tag", "@@@@ onDraw scale : " + scale + " left ：" + drawParams.left + " top : " + drawParams.top);
     }
 
@@ -153,6 +156,7 @@ public class GraffitiView extends View {
     }
 
     private void actionUp() {
+//        mGraffiti.actionUp();
         invalidate();
     }
 

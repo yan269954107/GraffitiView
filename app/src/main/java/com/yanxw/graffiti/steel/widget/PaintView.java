@@ -161,7 +161,7 @@ public class PaintView extends View {
         mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         mCanvas = new Canvas(mBitmap);
 
-        mStokeBrushPen.undo(mCanvas);
+        mStokeBrushPen.undo(mCanvas, true);
 
         invalidate();
     }

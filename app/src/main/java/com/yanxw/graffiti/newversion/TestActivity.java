@@ -8,22 +8,52 @@ import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.yanxw.graffiti.R;
+import com.yanxw.graffiti.SoftKeyBoardListener;
 
 import java.io.File;
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity implements MarkListener, AnnotationInterface {
 
     private float mScale = 1;
     private MarkView mMarkView;
+    private EditText mEdtText;
+    private int mCurrentStatus = AnnotationInterface.STATUS_DRAG;
+    private boolean keyboardIsShow = false;
+
+    TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Log.d("tag", "@@@@ onTextChanged:" + s.toString());
+            mMarkView.changeText(s.toString());
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+
+        mEdtText = findViewById(R.id.edt_text);
+        mEdtText.addTextChangedListener(mTextWatcher);
 
         final FrameLayout flContainer = findViewById(R.id.fl_container);
         flContainer.post(new Runnable() {
@@ -56,9 +86,10 @@ public class TestActivity extends AppCompatActivity {
                     page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
                     page.close();
 
-                    mMarkView = new MarkView(TestActivity.this, bitmap);
+                    mMarkView = new MarkView(TestActivity.this, bitmap, TestActivity.this, TestActivity.this);
                     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
                     flContainer.addView(mMarkView, params);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -68,8 +99,87 @@ public class TestActivity extends AppCompatActivity {
         findViewById(R.id.btn_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMarkView.undo();
+                mMarkView.undo(true);
             }
         });
+
+        findViewById(R.id.btn_add_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                codeSetEdit("");
+                mMarkView.addRectText();
+                keyboardIsShow = true;
+                Tools.showSoftKeyBoard(TestActivity.this, mEdtText);
+            }
+        });
+
+        findViewById(R.id.btn_draw).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentStatus = AnnotationInterface.STATUS_DRAW;
+            }
+        });
+
+        findViewById(R.id.btn_eraser).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentStatus = AnnotationInterface.STATUS_ERASER;
+            }
+        });
+
+        SoftKeyBoardListener.setListener(this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
+            @Override
+            public void keyBoardShow(int height) {
+
+            }
+
+            @Override
+            public void keyBoardHide(int height) {
+                mMarkView.resetEdit();
+            }
+        });
+    }
+
+    private void codeSetEdit(String text) {
+        mEdtText.removeTextChangedListener(mTextWatcher);
+        mEdtText.setText(text);
+        if (!TextUtils.isEmpty(text)) {
+            mEdtText.setSelection(text.length());
+        }
+        mEdtText.addTextChangedListener(mTextWatcher);
+    }
+
+    @Override
+    public void onDrawDown(MotionEvent event) {
+        Tools.hideKeyBoard(this);
+        keyboardIsShow = false;
+        mCurrentStatus = AnnotationInterface.STATUS_DRAG;
+    }
+
+    @Override
+    public void onTextDown(MotionEvent event) {
+        mCurrentStatus = AnnotationInterface.STATUS_DRAG_TEXT;
+    }
+
+    @Override
+    public void showKeyboard(String text) {
+        codeSetEdit(text);
+        keyboardIsShow = true;
+        Tools.showSoftKeyBoard(TestActivity.this, mEdtText);
+    }
+
+    @Override
+    public void formatText(String text) {
+        codeSetEdit(text);
+    }
+
+    @Override
+    public int getCurrentStatus() {
+        return mCurrentStatus;
+    }
+
+    @Override
+    public void onFling(int direct) {
+
     }
 }

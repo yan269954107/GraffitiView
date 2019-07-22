@@ -7,40 +7,40 @@
     android:orientation="vertical"
     tools:context=".newversion.TestActivity">
 
+    <EditText
+        android:id="@+id/edt_text"
+        android:layout_width="1px"
+        android:layout_height="0px"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/c_mark_red"
         android:orientation="horizontal">
-
-        <!--<Button-->
-        <!--android:id="@+id/btn_scale_big"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="放大"/>-->
-
-        <!--<Button-->
-        <!--android:id="@+id/btn_scale_small"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="缩小"/>-->
-
-        <!--<Button-->
-        <!--android:id="@+id/btn_translate_x"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="左移"/>-->
-
-        <!--<Button-->
-        <!--android:id="@+id/btn_translate_y"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="上移"/>-->
 
         <Button
             android:id="@+id/btn_undo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="撤销"/>
+
+        <Button
+            android:id="@+id/btn_add_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加文字"/>
+
+        <Button
+            android:id="@+id/btn_draw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="手写"/>
+
+        <Button
+            android:id="@+id/btn_eraser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="橡皮"/>
 
     </LinearLayout>
 

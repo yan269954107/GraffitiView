@@ -3,4 +3,132 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- ############## 新的颜色规范 start ############## -->
+    <color name="c_black">#000000</color>
+    <color name="c_dark">#262A30</color>
+    <color name="c_gray6">#848C96</color>
+    <color name="c_gray5">#5C626B</color>
+    <color name="c_gray4">#959BA3</color>
+    <color name="c_gray3">#CBCFD6</color>
+    <color name="c_gray2">#E9ECF0</color>
+    <color name="c_gray1">#F7F8F9</color>
+    <color name="c_white">#FFFFFF</color>
+
+    <color name="c_brand1">#FF9B9B</color>
+    <color name="c_link">#488FF9</color>
+    <color name="c_link1">#98C0FB</color>
+    <color name="c_success">#2DC888</color>
+    <color name="c_success1">#89E0BC</color>
+    <color name="c_tips">#FFFDE9</color>
+    <color name="c_caution">#F53939</color>
+    <color name="c_vip">#C09040</color>
+    <color name="c_vip1">#DBC093</color>
+    <color name="c_invalid">#CBCFD6</color>
+
+    <!--默认头像颜色-->
+    <color name="c_p_1">#2DC888</color>
+    <color name="c_p_2">#488FF9</color>
+    <color name="c_p_3">#FFA400</color>
+    <color name="c_p_4">#FB7171</color>
+
+
+    <!--默认应用色-->
+    <color name="c_a_green">#2DC888</color>
+    <color name="c_a_green1">#89E0BC</color>
+    <color name="c_a_blue">#488FF9</color>
+    <color name="c_a_blue1">#98C0FB</color>
+    <color name="c_a_yellow">#FFA400</color>
+    <color name="c_a_yellow1">#FFCC70</color>
+    <color name="c_a_red">#FB7171</color>
+    <color name="c_a_red1">#FDB1B1</color>
+    <color name="c_a_violet">#8D71FF</color>
+    <color name="c_a_violet1">#BEAFFF</color>
+    <color name="c_a_orange">#FF8022</color>
+    <color name="c_a_orange1">#FFB883</color>
+
+    <!-- ############## 新的颜色规范 end ############## -->
+
+    <!-- ############## 新的颜色规范带透明度的颜色 start ############## -->
+    <!--sample <color name="c_dark_50">#80262A30</color>-->
+
+    <color name="c_gray2_80">#CCE9ECF0</color>
+
+    <color name="c_gray4_30">#4C959BA3</color>
+    <color name="c_gray4_70">#B2959BA3</color>
+
+    <color name="c_gray5_20">#33959BA3</color>
+    <color name="c_gray5_50">#80959BA3</color>
+    <color name="c_gray5_70">#B2959BA3</color>
+
+    <color name="c_vip1_10">#19DBC093</color>
+    <color name="c_vip_15">#25C09040</color>
+    <color name="c_vip_20">#33C09040</color>
+
+    <color name="c_dark_3">#07262A30</color>
+    <color name="c_dark_10">#19262A30</color>
+    <color name="c_dark_40">#66262A30</color>
+    <color name="c_dark_50">#80262A30</color>
+    <color name="c_dark_70">#B2262A30</color>
+
+    <color name="c_a_orange_70">#B2FF8022</color>
+
+    <color name="c_a_yellow_15">#21FFA400</color>
+
+    <color name="c_a_blue_15">#25488FF9</color>
+    <color name="c_a_blue_20">#33488FF9</color>
+    <color name="c_a_blue_30">#4c488FF9</color>
+    <color name="c_a_blue_50">#80488FF9</color>
+    <color name="c_a_blue_80">#CC488FF9</color>
+
+    <color name="c_a_green_50">#802DC888</color>
+
+    <color name="c_caution_15">#26F53939</color>
+
+    <color name="c_a_yellow10">#19FFA400</color>
+
+    <color name="c_black_5">#0D000000</color>
+    <color name="c_black_7">#11000000</color>
+    <color name="c_black_10">#19000000</color>
+    <color name="c_black_20">#33000000</color>
+    <color name="c_black_30">#4C000000</color>
+    <color name="c_black_40">#66000000</color>
+    <color name="c_black_60">#99000000</color>
+    <color name="c_black_70">#B2000000</color>
+
+    <color name="c_white_10">#19FFFFFF</color>
+    <color name="c_white_20">#33FFFFFF</color>
+    <color name="c_white_30">#4CFFFFFF</color>
+    <color name="c_white_40">#66FFFFFF</color>
+    <color name="c_white_50">#80FFFFFF</color>
+    <color name="c_white_70">#B2FFFFFF</color>
+    <color name="c_white_90">#e5FFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="c_intro_30">#4C0066FF</color>
+    <color name="c_intro_50">#800066FF</color>
+    <!-- ############## 新的颜色规范带透明度的颜色 end ############## -->
+
+    <color name="live_gray">#DCDCDC</color>
+
+    <color name="c_a_blue_bg">#DAE9FE</color>
+    <color name="c_a_green_bg">#D5F4E7</color>
+    <color name="c_a_orange_bg">#FFEDCC</color>
+
+    <color name="c_333333">#333333</color>
+    <color name="c_666666">#666666</color>
+
+    <color name="c_mobile_task">#FF902F</color>
+    <color name="live_red">#FA565A</color>
+    <color name="c_d2312a">#D2312A</color>
+    <color name="c_fff1e4">#FFF1E4</color>
+    <color name="c_fff1e4_90">#e5FFF1E4</color>
+
+    <color name="c_a_red_70">#B2FB7171</color>
+
+    <color name="c_mark_red">#ff4d4d</color>
+    <color name="c_mark_yellow">#ffa400</color>
+    <color name="c_mark_blue">#488ff9</color>
+    <color name="c_mark_black">#000000</color>
 </resources>

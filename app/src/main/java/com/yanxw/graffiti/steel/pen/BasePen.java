@@ -12,7 +12,7 @@ import com.yanxw.graffiti.steel.config.PenConfig;
 import com.yanxw.graffiti.steel.util.Bezier;
 
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.LinkedList;
 
 /**
  * 画笔基类
@@ -25,7 +25,7 @@ public abstract class BasePen {
      * 绘制计算的次数，数值越小计算的次数越多
      */
     public static final int STEP_FACTOR = 20;
-    protected Stack<ArrayList<ControllerPoint>> mHWPointsStack = new Stack<>();
+    public static LinkedList<ArrayList<ControllerPoint>> sHWPointsList = new LinkedList<>();
     protected ArrayList<ControllerPoint> mHWPointList = new ArrayList<>();
     protected ArrayList<ControllerPoint> mHWPointCurrent = new ArrayList<>();
     protected ControllerPoint mLastPoint = new ControllerPoint(0, 0);
@@ -102,7 +102,7 @@ public abstract class BasePen {
             throw new NullPointerException("paint不能为null");
         }
         mHWPointList = new ArrayList<>();
-//        mHWPointsStack.add(mHWPointList);
+//        sHWPointsList.add(mHWPointList);
         ControllerPoint curPoint = getConvertPoint(event);
         //记录down的控制点的信息
         mLastWidth = 0.7 * mBaseWidth;
@@ -165,7 +165,7 @@ public abstract class BasePen {
         if (mHWPointList.size() == 0) {
             return;
         }
-        mHWPointsStack.add(mHWPointList);
+        sHWPointsList.push(mHWPointList);
 //        mCurPoint = new ControllerPoint(mElement.getX(), mElement.getY());
 //        double deltaX = mCurPoint.x - mLastPoint.x;
 //        double deltaY = mCurPoint.y - mLastPoint.y;
@@ -241,12 +241,12 @@ public abstract class BasePen {
      */
     protected abstract void doPreDraw(Canvas canvas);
 
-    public void undo(Canvas bitmapCanvas) {
-        if (mHWPointsStack.size() > 0) {
-            mHWPointsStack.pop();
+    public void undo(Canvas bitmapCanvas, boolean isPop) {
+        if (isPop && sHWPointsList.size() > 0) {
+            sHWPointsList.pop();
         }
         mHWPointCurrent.clear();
-        for (ArrayList<ControllerPoint> controllerPoints : mHWPointsStack) {
+        for (ArrayList<ControllerPoint> controllerPoints : sHWPointsList) {
             mCurPoint = null;
             mHWPointCurrent.addAll(controllerPoints);
             Log.d("tag", "@@@@ mHWPointCurrent size:" + mHWPointCurrent.size());

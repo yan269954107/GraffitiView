@@ -12,31 +12,33 @@ public class ConvertXY {
     private static final float MIN_SCALE = 1.0F;
     private static final float MAX_SCALE = 3.0F;
     private float mScale = 1.0f;
-    private float mInitTop, mInitLeft, mOffsetTop, mOffsetLeft;
+    private float mOffsetTop, mOffsetLeft;
     private float mTranslateX, mTranslateY;
     private float mMaxTranslateX, mMinTranslateX, mMaxTranslateY, mMinTranslateY;
     private int mWidth, mHeight;
-    private float mLastX, mLastY;
+    private float mCenterX, mCenterY;
 
     //记录两指刚按下时的距离
     private float mDownDistance, mLastDistance;
     //mDownPointF:双指按下时双指中间点的坐标， mLastPointF:双指移动后的最后一个点,用于计算平移的距离
     private PointF mDownPointF, mLastPointF;
 
-    public ConvertXY(float initTop, float initLeft, int imgWidth, int imgHeight) {
-        mInitTop = mOffsetTop = initTop;
-        mInitLeft = mOffsetLeft = initLeft;
-        mWidth = imgWidth;
-        mHeight = imgHeight;
+    public ConvertXY(float initTop, float initLeft, int viewWidth, int viewHeight) {
+        mOffsetTop = initTop;
+        mOffsetLeft = initLeft;
+        mWidth = viewWidth;
+        mHeight = viewHeight;
+        mCenterX = (float) mWidth / 2;
+        mCenterY = (float) mHeight / 2;
     }
 
+    /**
+     * 1：canvas.scale(mConvertXY.getScale(), mConvertXY.getScale(), centerX, centerY);
+     * 2：canvas.translate(mConvertXY.getTranslateX(), mConvertXY.getTranslateY());
+     * 3：canvas.drawBitmap(mPicBitmap, mConvertXY.getOffsetLeft(), mConvertXY.getOffsetTop(), null);
+     * 以上是绘制的顺序，1和2都会带来canvas的translate，以下方法就是将canvas上的坐标对应到bitmap上的坐标
+     */
     public PointF convert2BitmapXY(float x, float y) {
-        /**
-         * 1：canvas.scale(mConvertXY.getScale(), mConvertXY.getScale(), centerX, centerY);
-         * 2：canvas.translate(mConvertXY.getTranslateX(), mConvertXY.getTranslateY());
-         * 3：canvas.drawBitmap(mPicBitmap, mConvertXY.getOffsetLeft(), mConvertXY.getOffsetTop(), null);
-         * 以上是绘制的顺序，1和2都会带来canvas的translate，以下方法就是将canvas上的坐标对应到bitmap上的坐标
-         */
         float scaleTranslateX = 0;
         float scaleTranslateY = 0;
         if (mDownPointF != null) {
@@ -48,20 +50,26 @@ public class ConvertXY {
         return new PointF(targetX, targetY);
     }
 
-    public void setLastXY(float x, float y) {
-        PointF pointF = convert2BitmapXY(x, y);
-        mLastX = pointF.x;
-        mLastY = pointF.y;
+    /**
+     * 将点击坐标转换成最外层View的坐标
+     * 因为做外层view的canvas会做translate 和 scale操作，该方法就是找到当前点击坐标和原始状态的坐标对应关系
+     */
+    public PointF convert2ViewXY(float x, float y) {
+        float scaleTranslateX = 0;
+        float scaleTranslateY = 0;
+        if (mDownPointF != null) {
+            scaleTranslateX = mDownPointF.x - mDownPointF.x * mScale;
+            scaleTranslateY = mDownPointF.y - mDownPointF.y * mScale;
+        }
+        float targetX = (x - mTranslateX * mScale - scaleTranslateX) / mScale;
+        float targetY = (y - mTranslateY * mScale - scaleTranslateY) / mScale;
+        return new PointF(targetX, targetY);
     }
 
-    public void setLastXYInvalid() {
-        mLastX = Float.MIN_VALUE;
-        mLastY = Float.MIN_VALUE;
-    }
-
-    public boolean checkIsMove(PointF pointF) {
-        if (mLastX == Float.MIN_VALUE || mLastY == Float.MIN_VALUE) return false;
-        return pointF.x != mLastX || pointF.y != mLastY;
+    public PointF getViewCanvasCenter() {
+        PointF pointF = convert2ViewXY(mCenterX, mCenterY / 3 * 2);
+//        Log.d("tag", "@@@@ getViewCanvasCenter pointF:" + pointF);
+        return pointF;
     }
 
     public float getOffsetTop() {
@@ -72,46 +80,45 @@ public class ConvertXY {
         return mOffsetLeft;
     }
 
-    public float getLastX() {
-        return mLastX;
-    }
-
-    public float getLastY() {
-        return mLastY;
-    }
-
     public float getScale() {
         return mScale;
-    }
-
-    public PointF getLastPointF() {
-        return mLastPointF;
-    }
-
-    public void setLastPointF(PointF lastPointF) {
-        mLastPointF = lastPointF;
     }
 
     public float getTranslateX() {
         return mTranslateX;
     }
 
-    public void setTranslateX(float translateX) {
-        mTranslateX = translateX;
-    }
-
     public float getTranslateY() {
         return mTranslateY;
-    }
-
-    public void setTranslateY(float translateY) {
-        mTranslateY = translateY;
     }
 
     public PointF getDownPointF() {
         return mDownPointF;
     }
 
+    public float getCenterX() {
+        return mCenterX;
+    }
+
+    public float getCenterY() {
+        return mCenterY;
+    }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public void setWidth(int width) {
+        mWidth = width;
+    }
+
+    public int getHeight() {
+        return mHeight;
+    }
+
+    public void setHeight(int height) {
+        mHeight = height;
+    }
 
     public void doublePointerDown(MotionEvent event) {
         PointF preDownPointF = mDownPointF;
@@ -184,6 +191,7 @@ public class ConvertXY {
         if (mTranslateY < mMinTranslateY) mTranslateY = mMinTranslateY;
 
         mLastPointF = pointF;
+
     }
 
 }

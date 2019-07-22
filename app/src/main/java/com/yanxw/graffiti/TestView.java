@@ -70,6 +70,6 @@ public class TestView extends View {
         mCenterY = centerY;
         mTranslateX = translateX;
         mTranslateY = translateY;
-        postInvalidate();
+        invalidate();
     }
 }

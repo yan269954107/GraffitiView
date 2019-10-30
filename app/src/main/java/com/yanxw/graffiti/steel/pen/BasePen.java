@@ -3,12 +3,16 @@ package com.yanxw.graffiti.steel.pen;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import com.yanxw.graffiti.CollectionsUtil;
+import com.yanxw.graffiti.newversion.AnnotationInterface;
 import com.yanxw.graffiti.newversion.ConvertXY;
 import com.yanxw.graffiti.steel.config.ControllerPoint;
 import com.yanxw.graffiti.steel.config.PenConfig;
+import com.yanxw.graffiti.steel.config.PointsPath;
 import com.yanxw.graffiti.steel.util.Bezier;
 
 import java.util.ArrayList;
@@ -25,11 +29,15 @@ public abstract class BasePen {
      * 绘制计算的次数，数值越小计算的次数越多
      */
     public static final int STEP_FACTOR = 20;
-    public static LinkedList<ArrayList<ControllerPoint>> sHWPointsList = new LinkedList<>();
+    public static final float WIDTH_FACTOR = 8.0f;
+    public static LinkedList<PointsPath> sHWPointsList = new LinkedList<>();
     protected ArrayList<ControllerPoint> mHWPointList = new ArrayList<>();
     protected ArrayList<ControllerPoint> mHWPointCurrent = new ArrayList<>();
     protected ControllerPoint mLastPoint = new ControllerPoint(0, 0);
     protected Paint mPaint;
+    protected AnnotationInterface mAnnotationInterface;
+
+    protected RectF mPointBounds = null;
 
     /**
      * 笔的宽度信息
@@ -43,15 +51,32 @@ public abstract class BasePen {
 
     protected ControllerPoint mCurPoint;
 
-    private ConvertXY mConvertXY;
+    protected ConvertXY mConvertXY;
 
     public void setPaint(Paint paint) {
         mPaint = paint;
         mBaseWidth = paint.getStrokeWidth();
     }
 
+    public void setAnnotationInterface(AnnotationInterface annotationInterface) {
+        mAnnotationInterface = annotationInterface;
+    }
+
     public void setConvertXY(ConvertXY convertXY) {
         mConvertXY = convertXY;
+    }
+
+    public void setPointsList(LinkedList<PointsPath> pointsList, Canvas canvas) {
+        sHWPointsList = pointsList;
+        drawStack(sHWPointsList, canvas, false);
+    }
+
+    public void setPointStack(LinkedList<PointsPath> pointList) {
+        sHWPointsList = pointList;
+    }
+
+    public void clearPointsStack() {
+        sHWPointsList.clear();
     }
 
     public void draw(Canvas canvas) {
@@ -60,7 +85,7 @@ public abstract class BasePen {
         if (mHWPointCurrent == null || mHWPointCurrent.size() < 1) {
             return;
         }
-        doPreDraw(canvas);
+        doPreDraw(canvas, null, false);
     }
 
     private int lastId = 0;//记录最先/最后的手指id
@@ -98,11 +123,11 @@ public abstract class BasePen {
      * 按下的事件
      */
     public void onDown(MotionEvent event, Canvas canvas) {
+        Log.d("tag", "#### onDown x:" + event.getX() + " y:" + event.getY());
         if (mPaint == null) {
             throw new NullPointerException("paint不能为null");
         }
         mHWPointList = new ArrayList<>();
-//        sHWPointsList.add(mHWPointList);
         ControllerPoint curPoint = getConvertPoint(event);
         //记录down的控制点的信息
         mLastWidth = 0.7 * mBaseWidth;
@@ -118,25 +143,26 @@ public abstract class BasePen {
      * 手指移动的事件
      */
     public void onMove(MotionEvent event, Canvas canvas) {
+        Log.d("tag", "#### onMove x:" + event.getX() + " y:" + event.getY());
         ControllerPoint curPoint = getConvertPoint(event);
         double deltaX = curPoint.x - mLastPoint.x;
         double deltaY = curPoint.y - mLastPoint.y;
         //deltaX和deltay平方和的二次方根 想象一个例子 1+1的平方根为1.4 （x²+y²）开根号
         //同理，当滑动的越快的话，deltaX+deltaY的值越大，这个越大的话，curDis也越大
-        double curDis = Math.hypot(deltaX, deltaY);
+        double curDis = Math.hypot(deltaX * mConvertXY.getScale(), deltaY * mConvertXY.getScale());
         //我们求出的这个值越小，画的点或者是绘制椭圆形越多，这个值越大的话，绘制的越少，笔就越细，宽度越小
         double curVel = curDis * PenConfig.DIS_VEL_CAL_FACTOR;
         double curWidth;
         //点的集合少，我们得必须改变宽度,每次点击的down的时候，这个事件
         if (mHWPointList.size() < 2) {
 
-            curWidth = calcNewWidth(curVel, mLastVel, curDis, 1.7,
+            curWidth = calcNewWidth(curVel, mLastVel, curDis, WIDTH_FACTOR,
                     mLastWidth);
             curPoint.width = (float) curWidth;
             mBezier.init(mLastPoint, curPoint);
         } else {
             mLastVel = curVel;
-            curWidth = calcNewWidth(curVel, mLastVel, curDis, 1.7,
+            curWidth = calcNewWidth(curVel, mLastVel, curDis, WIDTH_FACTOR,
                     mLastWidth);
             curPoint.width = (float) curWidth;
             mBezier.addNode(curPoint);
@@ -162,31 +188,10 @@ public abstract class BasePen {
      * 手指抬起来的事件
      */
     public void onUp(MotionEvent mElement, Canvas canvas) {
-        if (mHWPointList.size() == 0) {
+        if (mHWPointList.size() <= 1) {
             return;
         }
-        sHWPointsList.push(mHWPointList);
-//        mCurPoint = new ControllerPoint(mElement.getX(), mElement.getY());
-//        double deltaX = mCurPoint.x - mLastPoint.x;
-//        double deltaY = mCurPoint.y - mLastPoint.y;
-//        double curDis = Math.hypot(deltaX, deltaY);
-//        mCurPoint.width = 0;
-//
-//        mBezier.addNode(mCurPoint);
-//
-//        int steps = 1 + (int) curDis / STEP_FACTOR;
-//        double step = 1.0 / steps;
-//        for (double t = 0; t < 1.0; t += step) {
-//            ControllerPoint point = mBezier.getPoint(t);
-//            mHWPointList.add(point);
-//        }
-//        mBezier.end();
-//        for (double t = 0; t < 1.0; t += step) {
-//            ControllerPoint point = mBezier.getPoint(t);
-//            mHWPointList.add(point);
-//        }
-//        draw(canvas);
-//        clear();
+        sHWPointsList.push(new PointsPath(mHWPointList, mPaint.getColor()));
     }
 
     /**
@@ -195,8 +200,14 @@ public abstract class BasePen {
     public double calcNewWidth(double curVel, double lastVel, double curDis,
                                double factor, double lastWidth) {
         double calVel = curVel * 0.6 + lastVel * (1 - 0.6);
+//        Log.d("tag", "@@@@ 1 calVel:" + calVel + " curVel:" + curVel + " lastVel:" + lastVel);
         double vfac = Math.log(factor * 2.0f) * (-calVel);
+//        Log.d("tag", "@@@@ 2 vfac:" + vfac + " factor:" + factor + " Math.log(factor * 2.0f):" + Math.log(factor * 2.0f));
         double calWidth = mBaseWidth * Math.exp(vfac);
+//        Log.d("tag", "@@@@ 3 calWidth:" + calWidth + " mBaseWidth:" + mBaseWidth + " Math.exp(vfac):" + Math.exp(vfac));
+        if (calWidth < 0.5) {
+            calWidth = 0.5;
+        }
         return calWidth;
     }
 
@@ -204,7 +215,12 @@ public abstract class BasePen {
      * 清除缓存的触摸点
      */
     public void clear() {
+        for (PointsPath pointsPath : sHWPointsList) {
+            pointsPath.setClean(true);
+        }
+//        sHWPointsList.clear();
         mHWPointList.clear();
+        mHWPointCurrent.clear();
     }
 
     /**
@@ -239,18 +255,60 @@ public abstract class BasePen {
     /**
      * onDraw之前的操作
      */
-    protected abstract void doPreDraw(Canvas canvas);
+    protected abstract void doPreDraw(Canvas canvas, Paint paint, boolean needCalculate);
+
+    public RectF getPointBounds() {
+        return mPointBounds;
+    }
 
     public void undo(Canvas bitmapCanvas, boolean isPop) {
         if (isPop && sHWPointsList.size() > 0) {
-            sHWPointsList.pop();
+            for (PointsPath pointsPath : sHWPointsList) {
+                if (!pointsPath.isClean()) {
+                    pointsPath.setClean(true);
+                    break;
+                }
+            }
         }
         mHWPointCurrent.clear();
-        for (ArrayList<ControllerPoint> controllerPoints : sHWPointsList) {
+        drawStack(sHWPointsList, bitmapCanvas, false);
+    }
+
+    public void drawStack(LinkedList<PointsPath> pointsStack, Canvas canvas, boolean needCalculate) {
+        if (needCalculate) {
+            mPointBounds = null;
+        }
+        if (CollectionsUtil.isEmpty(pointsStack)) return;
+        mHWPointCurrent.clear();
+        int currentColor = mPaint.getColor();
+        for (PointsPath pointsPath : pointsStack) {
+            if (pointsPath.isClean()) continue;
             mCurPoint = null;
-            mHWPointCurrent.addAll(controllerPoints);
-            Log.d("tag", "@@@@ mHWPointCurrent size:" + mHWPointCurrent.size());
-            doPreDraw(bitmapCanvas);
+            mHWPointCurrent.addAll(pointsPath.getPoints());
+//            Log.d("tag", "@@@@ mHWPointCurrent size:" + mHWPointCurrent.size());
+            mPaint.setColor(pointsPath.getColor());
+            doPreDraw(canvas, mPaint, needCalculate);
+        }
+        mPaint.setColor(currentColor);
+    }
+
+    public void compareBounds(ControllerPoint controllerPoint) {
+        if (mPointBounds == null) {
+            mPointBounds = new RectF(controllerPoint.getLeft(), controllerPoint.getTop(),
+                    controllerPoint.getRight(), controllerPoint.getBottom());
+        } else {
+            if (controllerPoint.getLeft() < mPointBounds.left) {
+                mPointBounds.left = controllerPoint.getLeft();
+            }
+            if (controllerPoint.getTop() < mPointBounds.top) {
+                mPointBounds.top = controllerPoint.getTop();
+            }
+            if (controllerPoint.getRight() > mPointBounds.right) {
+                mPointBounds.right = controllerPoint.getRight();
+            }
+            if (controllerPoint.getBottom() > mPointBounds.bottom) {
+                mPointBounds.bottom = controllerPoint.getBottom();
+            }
         }
     }
 }

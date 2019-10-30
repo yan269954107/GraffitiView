@@ -22,12 +22,17 @@ import com.yanxw.graffiti.SoftKeyBoardListener;
 
 import java.io.File;
 
-public class TestActivity extends AppCompatActivity implements MarkListener, AnnotationInterface {
+import static com.yanxw.graffiti.newversion.AnnotationConstants.STATUS_DRAG;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.STATUS_DRAG_TEXT;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.STATUS_DRAW;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.STATUS_ERASER;
+
+public class TestActivity extends AppCompatActivity implements AnnotationListener, AnnotationInterface {
 
     private float mScale = 1;
-    private MarkView mMarkView;
+    private AnnotationView mAnnotationView;
     private EditText mEdtText;
-    private int mCurrentStatus = AnnotationInterface.STATUS_DRAG;
+    private int mCurrentStatus = STATUS_DRAG;
     private boolean keyboardIsShow = false;
 
     TextWatcher mTextWatcher = new TextWatcher() {
@@ -39,7 +44,7 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             Log.d("tag", "@@@@ onTextChanged:" + s.toString());
-            mMarkView.changeText(s.toString());
+            mAnnotationView.changeText(s.toString());
         }
 
         @Override
@@ -60,7 +65,7 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
             @Override
             public void run() {
                 try {
-                    PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(new File("/sdcard/test.pdf"), ParcelFileDescriptor.MODE_READ_ONLY));
+                    PdfRenderer renderer = new PdfRenderer(ParcelFileDescriptor.open(new File("/sdcard/test_sign.pdf"), ParcelFileDescriptor.MODE_READ_ONLY));
                     PdfRenderer.Page page = renderer.openPage(0);
                     int width = page.getWidth();
                     int height = page.getHeight();
@@ -86,9 +91,9 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
                     page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
                     page.close();
 
-                    mMarkView = new MarkView(TestActivity.this, bitmap, TestActivity.this, TestActivity.this);
+                    mAnnotationView = new AnnotationView(TestActivity.this, bitmap, TestActivity.this, TestActivity.this);
                     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-                    flContainer.addView(mMarkView, params);
+                    flContainer.addView(mAnnotationView, params);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -99,7 +104,7 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
         findViewById(R.id.btn_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMarkView.undo(true);
+                mAnnotationView.undo(true);
             }
         });
 
@@ -107,7 +112,7 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
             @Override
             public void onClick(View v) {
                 codeSetEdit("");
-                mMarkView.addRectText();
+                mAnnotationView.addRectText();
                 keyboardIsShow = true;
                 Tools.showSoftKeyBoard(TestActivity.this, mEdtText);
             }
@@ -116,14 +121,14 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
         findViewById(R.id.btn_draw).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentStatus = AnnotationInterface.STATUS_DRAW;
+                mCurrentStatus = STATUS_DRAW;
             }
         });
 
         findViewById(R.id.btn_eraser).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentStatus = AnnotationInterface.STATUS_ERASER;
+                mCurrentStatus = STATUS_ERASER;
             }
         });
 
@@ -135,7 +140,7 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
 
             @Override
             public void keyBoardHide(int height) {
-                mMarkView.resetEdit();
+                mAnnotationView.resetEdit();
             }
         });
     }
@@ -153,12 +158,12 @@ public class TestActivity extends AppCompatActivity implements MarkListener, Ann
     public void onDrawDown(MotionEvent event) {
         Tools.hideKeyBoard(this);
         keyboardIsShow = false;
-        mCurrentStatus = AnnotationInterface.STATUS_DRAG;
+        mCurrentStatus = STATUS_DRAW;
     }
 
     @Override
     public void onTextDown(MotionEvent event) {
-        mCurrentStatus = AnnotationInterface.STATUS_DRAG_TEXT;
+        mCurrentStatus = STATUS_DRAG_TEXT;
     }
 
     @Override

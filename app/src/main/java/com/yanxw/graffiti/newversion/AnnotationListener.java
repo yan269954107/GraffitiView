@@ -3,10 +3,10 @@ package com.yanxw.graffiti.newversion;
 import android.view.MotionEvent;
 
 /**
- * MarkListener
+ * AnnotationListener
  * Created by yanxinwei on 2019-07-12.
  */
-public interface MarkListener {
+public interface AnnotationListener {
 
     void onDrawDown(MotionEvent event);
 

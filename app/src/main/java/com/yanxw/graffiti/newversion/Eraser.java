@@ -4,8 +4,10 @@ import android.graphics.PointF;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import com.yanxw.graffiti.CommonUtils;
 import com.yanxw.graffiti.Handlers;
 import com.yanxw.graffiti.steel.config.ControllerPoint;
+import com.yanxw.graffiti.steel.config.PointsPath;
 import com.yanxw.graffiti.steel.pen.BasePen;
 
 import java.util.ArrayList;
@@ -21,12 +23,12 @@ public class Eraser {
 
     private PointF mLastPointF;
 
-    private float mCheckAccuracy = Tools.dp2Px(5);
-    private MarkView mMarkView;
+    private float mCheckAccuracy = CommonUtils.dp2px(5);
+    private AnnotationView mAnnotationView;
 
-    public Eraser(MarkView markView) {
+    public Eraser(AnnotationView annotationView) {
         start();
-        mMarkView = markView;
+        mAnnotationView = annotationView;
     }
 
     private void start() {
@@ -54,52 +56,38 @@ public class Eraser {
             }
         }
 
-        mCheckHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isUp) mLastPointF = null;
-            }
+        mCheckHandler.post(() -> {
+            if (isUp) mLastPointF = null;
         });
 
     }
 
     private void check(final PointF pointF) {
 //        Log.d("tag", "@@@@ pointF:" + pointF + " lastPointF:" + mLastPointF);
-        mCheckHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < BasePen.sHWPointsList.size(); i++) {
-                    ArrayList<ControllerPoint> controllerPoints = BasePen.sHWPointsList.get(i);
-                    if (controllerPoints.size() > 1) {
-                        for (int j = 0; j < controllerPoints.size() - 1; j++) {
-                            if (intersect(pointF, mLastPointF, controllerPoints.get(j).getPoint(), controllerPoints.get(j + 1).getPoint())) {
+        mCheckHandler.post(() -> {
+            for (int i = 0; i < BasePen.sHWPointsList.size(); i++) {
+                PointsPath pointsPath = BasePen.sHWPointsList.get(i);
+                if (pointsPath.isClean()) continue;
+                ArrayList<ControllerPoint> controllerPoints = pointsPath.getPoints();
+                if (controllerPoints.size() > 1) {
+                    for (int j = 0; j < controllerPoints.size() - 1; j++) {
+                        if (intersect(pointF, mLastPointF, controllerPoints.get(j).getPoint(), controllerPoints.get(j + 1).getPoint())) {
 //                                Log.d("tag", "@@@@ check undo thread:" + Thread.currentThread());
-                                BasePen.sHWPointsList.remove(i);
-                                Handlers.postMain(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mMarkView.undo(false);
-                                    }
-                                });
-                                return;
-                            }
-                        }
-                    } else if (controllerPoints.size() == 1){
-                        if (intersect(pointF, mLastPointF, controllerPoints.get(0).getPoint(), controllerPoints.get(0).getPoint())) {
-//                            Log.d("tag", "@@@@ check undo thread:" + Thread.currentThread());
-                            BasePen.sHWPointsList.remove(i);
-                            Handlers.postMain(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mMarkView.undo(false);
-                                }
-                            });
+                            BasePen.sHWPointsList.get(i).setClean(true);
+                            Handlers.postMain(() -> mAnnotationView.undo(false));
                             return;
                         }
                     }
+                } else if (controllerPoints.size() == 1) {
+                    if (intersect(pointF, mLastPointF, controllerPoints.get(0).getPoint(), controllerPoints.get(0).getPoint())) {
+//                            Log.d("tag", "@@@@ check undo thread:" + Thread.currentThread());
+                        BasePen.sHWPointsList.get(i).setClean(true);
+                        Handlers.postMain(() -> mAnnotationView.undo(false));
+                        return;
+                    }
                 }
-                mLastPointF = pointF;
             }
+            mLastPointF = pointF;
         });
     }
 

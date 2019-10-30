@@ -15,7 +15,7 @@ public class PenConfig {
     /**
      * 画笔大小等级
      */
-    public static int PAINT_SIZE_LEVEL = 0;
+    public static int PAINT_SIZE_LEVEL = 2;
 
     /**
      * 画笔颜色

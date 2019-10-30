@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.yanxw.graffiti.CollectionsUtil;
+import com.yanxw.graffiti.CommonUtils;
 import com.yanxw.graffiti.R;
 import com.yanxw.graffiti.newversion.model.RectText;
 
@@ -20,11 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import static com.yanxw.graffiti.newversion.AnnotationInterface.OPT_NULL;
-import static com.yanxw.graffiti.newversion.AnnotationInterface.OPT_REDRAW;
-import static com.yanxw.graffiti.newversion.AnnotationInterface.OPT_REDRAW_KEYBOARD;
-import static com.yanxw.graffiti.newversion.AnnotationInterface.TYPE_RECT_CLOSE;
-import static com.yanxw.graffiti.newversion.AnnotationInterface.TYPE_RECT_NORMAL;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.OPT_NULL;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.OPT_REDRAW;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.OPT_REDRAW_KEYBOARD;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.TYPE_RECT_CLOSE;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.TYPE_RECT_NORMAL;
 
 /**
  * InputText
@@ -32,28 +33,28 @@ import static com.yanxw.graffiti.newversion.AnnotationInterface.TYPE_RECT_NORMAL
  */
 public class InputText {
 
-    private static final int sDefaultWidth = Tools.dp2Px(80);
-    private static final int sDefaultHeight = Tools.dp2Px(20);
-    private static final int sTextPaddingLeft = Tools.dp2Px(5);
-    private static final int sDashWidth = Tools.dp2Px(2);
-    private static final int sCloseWidth = Tools.dp2Px(11);
+    private static final int sDefaultWidth = CommonUtils.dp2px(114);
+    private static final int sDefaultHeight = CommonUtils.dp2px(23);
+    private static final int sTextPaddingLeft = CommonUtils.dp2px(5);
+    private static final int sDashWidth = CommonUtils.dp2px(2);
+    private static final int sCloseWidth = CommonUtils.dp2px(17);
     private static final int sCloseRadius = sCloseWidth / 2;
-    private static final int sClosePadding = Tools.dp2Px(2.5F);
-    private static final int sClickRange = Tools.dp2Px(2);
+    private static final int sClosePadding = CommonUtils.dip2px(4.5F);
+    private static final int sClickRange = CommonUtils.dp2px(2);
     private static final long sClickTime = 300;
-    private static final int sTextPaddingTop = Tools.dp2Px(2);
+    private static final int sTextPaddingTop = CommonUtils.dp2px(3);
 
     private Context mContext;
     private LinkedList<RectText> mRectTexts = new LinkedList<>();
+    private RectText mCurrentRectText;
+    private RectF mTextBounds;
 
-    private Paint mBorderPaint;
+    //    private Paint mBorderPaint;
     private Paint mEditBorderPaint;
-    private Paint mFillPaint;
+    //    private Paint mFillPaint;
     private TextPaint mTextPaint;
     private Paint mCloseBgPaint;
     private Paint mCloseLinePaint;
-
-    private RectText mCurrentRectText;
 
     private PointF mLastPointF;
     private ConvertXY mConvertXY;
@@ -61,29 +62,28 @@ public class InputText {
     private int mDownType = TYPE_RECT_NORMAL;
     private long mDownTime;
     private int mDownIndex = -1;
-    private MarkListener mMarkListener;
+    private AnnotationListener mAnnotationListener;
 
-    public InputText(Context context, MarkListener markListener) {
-
+    public InputText(Context context, AnnotationListener annotationListener) {
         mContext = context;
-        mMarkListener = markListener;
+        mAnnotationListener = annotationListener;
 
-        mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBorderPaint.setStyle(Paint.Style.STROKE);
-        mBorderPaint.setStrokeWidth(1);
+//        mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        mBorderPaint.setStyle(Paint.Style.STROKE);
+//        mBorderPaint.setStrokeWidth(1);
 
         mEditBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mEditBorderPaint.setStyle(Paint.Style.STROKE);
-        mEditBorderPaint.setStrokeWidth(Tools.dp2Px(mContext, 1));
+        mEditBorderPaint.setStrokeWidth(CommonUtils.dp2px(mContext, 1));
         mEditBorderPaint.setColor(mContext.getResources().getColor(R.color.c_mark_red));
         mEditBorderPaint.setPathEffect(new DashPathEffect(new float[]{sTextPaddingLeft, sDashWidth}, 0));
 
-        mFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mFillPaint.setStyle(Paint.Style.FILL);
-        mFillPaint.setColor(mContext.getResources().getColor(R.color.c_white));
+//        mFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        mFillPaint.setStyle(Paint.Style.FILL);
+//        mFillPaint.setColor(mContext.getResources().getColor(R.color.c_white));
 
         mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextSize(Tools.dp2Px(10));
+        mTextPaint.setTextSize(CommonUtils.dp2px(11));
         mTextPaint.setColor(Color.BLACK);
 
         mCloseBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -93,11 +93,15 @@ public class InputText {
         mCloseLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCloseLinePaint.setStyle(Paint.Style.STROKE);
         mCloseLinePaint.setColor(mContext.getResources().getColor(R.color.c_white));
-        mCloseLinePaint.setStrokeWidth(Tools.dp2Px(1));
+        mCloseLinePaint.setStrokeWidth(CommonUtils.dp2px(1));
     }
 
     public void setConvertXY(ConvertXY convertXY) {
         mConvertXY = convertXY;
+    }
+
+    public void setRectTexts(LinkedList<RectText> rectTexts) {
+        mRectTexts = rectTexts;
     }
 
     public void addRectText() {
@@ -120,11 +124,21 @@ public class InputText {
     }
 
     public void draw(Canvas canvas) {
-        for (RectText rectText : mRectTexts) {
+        draw(canvas, false, mRectTexts);
+    }
+
+    public void draw(Canvas canvas, boolean isCalculate, LinkedList<RectText> rectTexts) {
+        for (RectText rectText : rectTexts) {
+
+            if (rectText.isClean()) continue;
+
             RectF rectF = rectText.getRect();
+            if (isCalculate) {
+                Log.d("tag", "#### draw rectF:" + rectF);
+            }
             resolveTextRect(rectText);
 
-            canvas.drawRect(rectF, mFillPaint);
+//            canvas.drawRect(rectF, mFillPaint);
 
             String drawText = rectText.getText();
             if (!TextUtils.isEmpty(drawText)) {
@@ -141,9 +155,37 @@ public class InputText {
                 rectText.setCloseRect((float) sCloseWidth / 2);
                 rectText.drawClose(canvas, sCloseRadius, mCloseBgPaint, mCloseLinePaint, sClosePadding);
             } else {
-                canvas.drawRect(rectF, mBorderPaint);
+//                canvas.drawRect(rectF, mBorderPaint);
+
+                if (isCalculate) {
+                    if (mTextBounds == null) {
+                        mTextBounds = new RectF(rectF);
+                    } else {
+                        if (rectF.left < mTextBounds.left) {
+                            mTextBounds.left = rectF.left;
+                        }
+                        if (rectF.top < mTextBounds.top) {
+                            mTextBounds.top = rectF.top;
+                        }
+                        if (rectF.right > mTextBounds.right) {
+                            mTextBounds.right = rectF.right;
+                        }
+                        if (rectF.bottom > mTextBounds.bottom) {
+                            mTextBounds.bottom = rectF.bottom;
+                        }
+                    }
+                    Log.d("tag", "#### draw mTextBounds:" + mTextBounds);
+                }
             }
         }
+    }
+
+    public RectF getTextBounds() {
+        return mTextBounds;
+    }
+
+    public void setTextBounds(RectF textBounds) {
+        mTextBounds = textBounds;
     }
 
     private void resolveTextRect(RectText rectText) {
@@ -207,7 +249,7 @@ public class InputText {
                     sb.deleteCharAt(sb.length() - 1);
                 }
                 rectText.setText(sb.toString());
-                mMarkListener.formatText(sb.toString());
+                mAnnotationListener.formatText(sb.toString());
             }
         }
         textWidth += (float) 2 * sTextPaddingLeft;
@@ -220,7 +262,7 @@ public class InputText {
                 rectF.right = rectF.left + textWidth;
             }
         }
-        if (textHeight > rectF.height()) {
+        if (textHeight != rectF.height()) {
             rectF.bottom = rectF.top + textHeight;
         }
     }
@@ -310,12 +352,19 @@ public class InputText {
         PointF pointF = mConvertXY.convert2ViewXY(event.getX(), event.getY());
         if (mDownType == TYPE_RECT_CLOSE) {
             if (checkClick(pointF)) {
-                mRectTexts.remove(mDownIndex);
-                mCurrentRectText = null;
+                if (mDownIndex != -1) {
+                    mRectTexts.get(mDownIndex).setClean(true);
+                    mCurrentRectText = null;
+                }
                 return OPT_REDRAW;
             }
         } else if (mDownType == TYPE_RECT_NORMAL) {
             if (checkClick(pointF)) {
+                for (int i = 0; i < mRectTexts.size(); i++) {
+                    if (i != mDownIndex) {
+                        mRectTexts.get(i).setEdit(false);
+                    }
+                }
                 mCurrentRectText.setEdit(true);
                 return OPT_REDRAW_KEYBOARD;
             }
@@ -347,5 +396,10 @@ public class InputText {
     public String getCurrentText() {
         if (mCurrentRectText == null) return "";
         return mCurrentRectText.getText();
+    }
+
+    public void clear() {
+        mRectTexts.clear();
+        mCurrentRectText = null;
     }
 }

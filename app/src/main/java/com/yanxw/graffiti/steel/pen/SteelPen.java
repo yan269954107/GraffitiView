@@ -3,7 +3,6 @@ package com.yanxw.graffiti.steel.pen;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.yanxw.graffiti.steel.config.ControllerPoint;
 
@@ -17,9 +16,9 @@ import com.yanxw.graffiti.steel.config.ControllerPoint;
 public class SteelPen extends BasePen {
 
     @Override
-    protected void doPreDraw(Canvas canvas) {
+    protected void doPreDraw(Canvas canvas, Paint paint, boolean needCalculate) {
         if (mHWPointCurrent.isEmpty()) {
-            Log.d("tag", "@@@@ mHWPointCurrent.isEmpty() : ");
+//            Log.d("tag", "@@@@ mHWPointCurrent.isEmpty() : ");
             try {
                 throw new NullPointerException();
             } catch (Exception e) {
@@ -34,8 +33,15 @@ public class SteelPen extends BasePen {
         }
         for (int i = startIndex; i < mHWPointCurrent.size(); i++) {
             ControllerPoint point = mHWPointCurrent.get(i);
-            drawToPoint(canvas, point, mPaint);
+            if (paint == null) {
+                drawToPoint(canvas, point, mPaint);
+            } else {
+                drawToPoint(canvas, point, paint);
+            }
             mCurPoint = point;
+            if (needCalculate) {
+                compareBounds(point);
+            }
         }
         mHWPointCurrent.clear();
     }
@@ -46,6 +52,12 @@ public class SteelPen extends BasePen {
         double step = 1.0 / steps;
         for (double t = 0; t < 1.0; t += step) {
             ControllerPoint point = mBezier.getPoint(t);
+            if (!mHWPointList.isEmpty()) {
+                ControllerPoint controllerPoint = mHWPointList.get(mHWPointList.size() - 1);
+                if (point.equals(controllerPoint)) {
+                    continue;
+                }
+            }
             mHWPointList.add(point);
             mHWPointCurrent.add(point);
         }
@@ -81,10 +93,15 @@ public class SteelPen extends BasePen {
 
         for (int i = 0; i < steps; i++) {
             RectF oval = new RectF();
-            float top = (float) (y - w / 2.0f);
-            float left = (float) (x - w / 4.0f);
-            float right = (float) (x + w / 4.0f);
-            float bottom = (float) (y + w / 2.0f);
+//            float top = (float) (y - w / 2.0f);
+//            float left = (float) (x - w / 4.0f);
+//            float right = (float) (x + w / 2.0f);
+//            float bottom = (float) (y + w / 4.0f);
+            float top = (float) (y - w * 2);
+            float left = (float) (x - w);
+            float right = (float) (x + w * 2);
+            float bottom = (float) (y + w);
+//            Log.d("tag", "@@@@ top:" + top + " left:" + left + " right:" + right + " bottom:" + bottom + " w:" + w + " paintWidth:" + paint.getStrokeWidth());
             oval.set(left, top, right, bottom);
             //最基本的实现，通过点控制线，绘制椭圆
             canvas.drawOval(oval, paint);

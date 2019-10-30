@@ -15,6 +15,9 @@ public class RectText {
     private String mText;
     private RectF mCloseRect;
     private boolean isEdit = true;
+    private RectF mSavedRect;
+    private String mSavedText;
+    private boolean isClean = false;
 
     public RectText() {
     }
@@ -28,6 +31,12 @@ public class RectText {
         mRect = rect;
         mText = text;
         mCloseRect = closeRect;
+    }
+
+    public RectText(RectF rect, String text, boolean isEdit) {
+        mRect = rect;
+        mText = text;
+        this.isEdit = isEdit;
     }
 
     public RectF getCloseRect() {
@@ -62,6 +71,46 @@ public class RectText {
         isEdit = edit;
     }
 
+    public RectF getSavedRect() {
+        return mSavedRect;
+    }
+
+    public void setSavedRect(RectF savedRect) {
+        mSavedRect = savedRect;
+    }
+
+    public String getSavedText() {
+        return mSavedText;
+    }
+
+    public void setSavedText(String savedText) {
+        mSavedText = savedText;
+    }
+
+    public void setSaved() {
+        mSavedRect = new RectF(mRect);
+        mSavedText = mText;
+    }
+
+    public boolean isClean() {
+        return isClean;
+    }
+
+    public void setClean(boolean clean) {
+        isClean = clean;
+    }
+
+    public boolean resetSaved() {
+        if (mSavedRect == null || mSavedText == null) return true;
+        if (!mSavedRect.equals(mRect)) {
+            mRect = new RectF(mSavedRect);
+        }
+        if (!mSavedText.equals(mText)) {
+            mText = mSavedText;
+        }
+        return false;
+    }
+
     public PointF getCloseCenter(float radius) {
         return new PointF(mCloseRect.left + radius, mCloseRect.top + radius);
     }
@@ -86,5 +135,13 @@ public class RectText {
         startX = mCloseRect.right - closePadding;
         stopX = mCloseRect.left + closePadding;
         canvas.drawLine(startX, startY, stopX, stopY, closeLinePaint);
+    }
+
+    public void processOffset(float offsetX, float offsetY) {
+        isEdit = false;
+        mRect.left = mRect.left - offsetX;
+        mRect.right = mRect.right - offsetX;
+        mRect.top = mRect.top - offsetY;
+        mRect.bottom = mRect.bottom - offsetY;
     }
 }

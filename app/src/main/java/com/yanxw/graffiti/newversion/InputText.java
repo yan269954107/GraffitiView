@@ -26,22 +26,20 @@ import static com.yanxw.graffiti.newversion.AnnotationConstants.OPT_REDRAW;
 import static com.yanxw.graffiti.newversion.AnnotationConstants.OPT_REDRAW_KEYBOARD;
 import static com.yanxw.graffiti.newversion.AnnotationConstants.TYPE_RECT_CLOSE;
 import static com.yanxw.graffiti.newversion.AnnotationConstants.TYPE_RECT_NORMAL;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.sDashWidth;
+import static com.yanxw.graffiti.newversion.AnnotationConstants.sTextPaddingLeft;
 
 /**
  * InputText
  * Created by yanxinwei on 2019-07-12.
  */
-public class InputText {
+public class InputText extends ClickCheckItr{
 
     private static final int sDefaultWidth = CommonUtils.dp2px(114);
     private static final int sDefaultHeight = CommonUtils.dp2px(23);
-    private static final int sTextPaddingLeft = CommonUtils.dp2px(5);
-    private static final int sDashWidth = CommonUtils.dp2px(2);
     private static final int sCloseWidth = CommonUtils.dp2px(17);
     private static final int sCloseRadius = sCloseWidth / 2;
     private static final int sClosePadding = CommonUtils.dip2px(4.5F);
-    private static final int sClickRange = CommonUtils.dp2px(2);
-    private static final long sClickTime = 300;
     private static final int sTextPaddingTop = CommonUtils.dp2px(3);
 
     private Context mContext;
@@ -49,18 +47,14 @@ public class InputText {
     private RectText mCurrentRectText;
     private RectF mTextBounds;
 
-    //    private Paint mBorderPaint;
     private Paint mEditBorderPaint;
-    //    private Paint mFillPaint;
     private TextPaint mTextPaint;
     private Paint mCloseBgPaint;
     private Paint mCloseLinePaint;
 
-    private PointF mLastPointF;
     private ConvertXY mConvertXY;
 
     private int mDownType = TYPE_RECT_NORMAL;
-    private long mDownTime;
     private int mDownIndex = -1;
     private AnnotationListener mAnnotationListener;
 
@@ -105,7 +99,7 @@ public class InputText {
     }
 
     public void addRectText() {
-        PointF centerPoint = mConvertXY.getViewCanvasCenter();
+        PointF centerPoint = mConvertXY.getInputTextCenter();
         RectText rectText = new RectText();
         float halfWidth = (float) sDefaultWidth / 2;
         float halfHeight = (float) sDefaultHeight / 2;
@@ -249,7 +243,7 @@ public class InputText {
                     sb.deleteCharAt(sb.length() - 1);
                 }
                 rectText.setText(sb.toString());
-                mAnnotationListener.formatText(sb.toString());
+                if (mAnnotationListener != null) mAnnotationListener.formatText(sb.toString());
             }
         }
         textWidth += (float) 2 * sTextPaddingLeft;
@@ -302,6 +296,7 @@ public class InputText {
         mCurrentRectText = rectText;
         mDownType = type;
         mLastPointF = pointF;
+        mDownPointF = pointF;
         mDownTime = System.currentTimeMillis();
         mDownIndex = index;
     }
@@ -370,14 +365,6 @@ public class InputText {
             }
         }
         return OPT_NULL;
-    }
-
-    private boolean checkClick(PointF pointF) {
-        float moveX = Math.abs(mLastPointF.x - pointF.x);
-        float moveY = Math.abs(mLastPointF.y - pointF.y);
-        long time = System.currentTimeMillis() - mDownTime;
-        Log.d("tag", "@@@@ moveX:" + moveX + " moveY:" + moveY + " time:" + time);
-        return moveX < sClickRange && moveY < sClickRange && time < sClickTime;
     }
 
     public boolean resetEdit() {

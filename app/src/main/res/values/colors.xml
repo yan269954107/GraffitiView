@@ -131,4 +131,6 @@
     <color name="c_mark_yellow">#ffa400</color>
     <color name="c_mark_blue">#488ff9</color>
     <color name="c_mark_black">#000000</color>
+
+    <color name="mark_bg">#595959</color>
 </resources>

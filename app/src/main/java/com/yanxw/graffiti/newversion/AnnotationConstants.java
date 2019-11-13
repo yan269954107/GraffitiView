@@ -19,6 +19,7 @@ public interface AnnotationConstants {
     int STATUS_DRAG = 2;
     int STATUS_ERASER = 3;
     int STATUS_DRAG_TEXT = 4;
+    int STATUS_WRITING_TEXT = 5;
 
     int DIRECT_LEFT = 1;
     int DIRECT_RIGHT = 2;
@@ -32,5 +33,11 @@ public interface AnnotationConstants {
     int OPT_NULL = 1;
     int OPT_REDRAW = 2;
     int OPT_REDRAW_KEYBOARD = 3;
+
+    int VIEW_TYPE_FULL = 1;
+    int VIEW_TYPE_WRITING = 2;
+
+    int sTextPaddingLeft = CommonUtils.dp2px(5);
+    int sDashWidth = CommonUtils.dp2px(2);
 
 }

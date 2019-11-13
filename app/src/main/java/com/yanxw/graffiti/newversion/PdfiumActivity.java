@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 import com.yanxw.graffiti.R;
+import com.yanxw.graffiti.newversion.model.WritingWords;
 
 import java.io.File;
 import java.util.List;
@@ -119,12 +120,37 @@ public class PdfiumActivity extends AppCompatActivity implements AnnotationListe
     }
 
     @Override
+    public void onWritingDown(MotionEvent event) {
+
+    }
+
+    @Override
+    public void onWritingMove(MotionEvent event) {
+
+    }
+
+    @Override
+    public void onWritingUp(MotionEvent event) {
+
+    }
+
+    @Override
+    public void onSizeChange(int imgWidth, int imgHeight, int w, int h) {
+
+    }
+
+    @Override
     public void showKeyboard(String text) {
 
     }
 
     @Override
     public void formatText(String text) {
+
+    }
+
+    @Override
+    public void goEditWriting(WritingWords writingWords) {
 
     }
 }

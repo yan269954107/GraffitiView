@@ -78,10 +78,13 @@ public class ConvertXY {
         return new PointF(targetX, targetY);
     }
 
-    public PointF getViewCanvasCenter() {
-        PointF pointF = convert2ViewXY(mCenterX, mCenterY / 3 * 2);
-//        Log.d("tag", "@@@@ getViewCanvasCenter pointF:" + pointF);
-        return pointF;
+    public PointF getInputTextCenter() {
+        //        Log.d("tag", "@@@@ getInputTextCenter pointF:" + pointF);
+        return convert2ViewXY(mCenterX, mCenterY / 3 * 2);
+    }
+
+    public PointF getCanvasCenter() {
+        return convert2ViewXY(mCenterX, mCenterY);
     }
 
     public float getOffsetTop() {
@@ -221,7 +224,6 @@ public class ConvertXY {
     }
 
 
-
     public boolean checkOriginal() {
         if (mScale <= 1.0F) {
             mScale = 1.0F;
@@ -230,6 +232,12 @@ public class ConvertXY {
             return false;
         }
         return true;
+    }
+
+    public void restore() {
+        mScale = 1.0F;
+        mTranslateX = 0;
+        mTranslateY = 0;
     }
 
 }

@@ -92,7 +92,7 @@ public class GraffitiView extends View {
         canvas.drawBitmap(mPicBitmap, drawParams.left, drawParams.top, mPaint);
         mGraffiti.draw();
         canvas.drawBitmap(mGraffiti.getGraffitiBitmap(), drawParams.left, drawParams.top, null);
-        Log.d("tag", "@@@@ onDraw scale : " + scale + " left ：" + drawParams.left + " top : " + drawParams.top);
+        Log.d("tag", "@@@@ draw scale : " + scale + " left ：" + drawParams.left + " top : " + drawParams.top);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class GraffitiView extends View {
         //举例ACTION_POINTER_DOWN事件的action为261，不按位与的话识别不出来
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Log.d("tag", "@@@@ ACTION_DOWN");
+//                Log.d("tag", "@@@@ ACTION_DOWN");
                 mTouchMode = TOUCH_MODE_SINGLE;
                 actionDown(event.getX(), event.getY());
                 break;

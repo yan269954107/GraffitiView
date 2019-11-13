@@ -8,7 +8,6 @@ import com.yanxw.graffiti.CommonUtils;
 import com.yanxw.graffiti.Handlers;
 import com.yanxw.graffiti.steel.config.ControllerPoint;
 import com.yanxw.graffiti.steel.config.PointsPath;
-import com.yanxw.graffiti.steel.pen.BasePen;
 
 import java.util.ArrayList;
 
@@ -65,15 +64,15 @@ public class Eraser {
     private void check(final PointF pointF) {
 //        Log.d("tag", "@@@@ pointF:" + pointF + " lastPointF:" + mLastPointF);
         mCheckHandler.post(() -> {
-            for (int i = 0; i < BasePen.sHWPointsList.size(); i++) {
-                PointsPath pointsPath = BasePen.sHWPointsList.get(i);
+            for (int i = 0; i < mAnnotationView.getCurrentHWPointsList().size(); i++) {
+                PointsPath pointsPath = mAnnotationView.getCurrentHWPointsList().get(i);
                 if (pointsPath.isClean()) continue;
                 ArrayList<ControllerPoint> controllerPoints = pointsPath.getPoints();
                 if (controllerPoints.size() > 1) {
                     for (int j = 0; j < controllerPoints.size() - 1; j++) {
                         if (intersect(pointF, mLastPointF, controllerPoints.get(j).getPoint(), controllerPoints.get(j + 1).getPoint())) {
 //                                Log.d("tag", "@@@@ check undo thread:" + Thread.currentThread());
-                            BasePen.sHWPointsList.get(i).setClean(true);
+                            mAnnotationView.getCurrentHWPointsList().get(i).setClean(true);
                             Handlers.postMain(() -> mAnnotationView.undo(false));
                             return;
                         }
@@ -81,7 +80,7 @@ public class Eraser {
                 } else if (controllerPoints.size() == 1) {
                     if (intersect(pointF, mLastPointF, controllerPoints.get(0).getPoint(), controllerPoints.get(0).getPoint())) {
 //                            Log.d("tag", "@@@@ check undo thread:" + Thread.currentThread());
-                        BasePen.sHWPointsList.get(i).setClean(true);
+                        mAnnotationView.getCurrentHWPointsList().get(i).setClean(true);
                         Handlers.postMain(() -> mAnnotationView.undo(false));
                         return;
                     }

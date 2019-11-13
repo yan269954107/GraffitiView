@@ -17,4 +17,8 @@ public final class Handlers {
         MAIN.postDelayed(runnable, delayMillis);
     }
 
+    public static void removeRunnable(Runnable runnable) {
+        MAIN.removeCallbacks(runnable);
+    }
+
 }

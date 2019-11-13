@@ -1,53 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".newversion.TestActivity">
-
-    <EditText
-        android:id="@+id/edt_text"
-        android:layout_width="1px"
-        android:layout_height="0px"/>
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/c_mark_red"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".newversion.TestActivity">
 
-        <Button
-            android:id="@+id/btn_undo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="撤销"/>
+        <EditText
+            android:id="@+id/edt_text"
+            android:layout_width="1px"
+            android:layout_height="0px"
+            android:layout_weight="0" />
 
-        <Button
-            android:id="@+id/btn_add_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="添加文字"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/c_mark_red"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_draw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手写"/>
+            <TextView
+                android:id="@+id/btn_undo"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/c_gray3"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="撤销" />
 
-        <Button
-            android:id="@+id/btn_eraser"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="橡皮"/>
+            <TextView
+                android:id="@+id/btn_add_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/c_gray3"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="添加文字" />
+
+            <TextView
+                android:id="@+id/btn_draw"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/c_gray3"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="手写" />
+
+            <TextView
+                android:id="@+id/btn_eraser"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/c_gray3"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="橡皮" />
+
+            <TextView
+                android:id="@+id/btn_add_write"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/c_gray3"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="手写输入" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:id="@+id/fl_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_opt_container"
+            android:layout_width="match_parent"
+            android:layout_height="104dp"
+            android:visibility="visible">
+
+
+        </RelativeLayout>
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/fl_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimary"/>
+    <LinearLayout
+        android:id="@+id/ll_recycle_bin"
+        android:layout_width="164dp"
+        android:layout_height="76dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/mark_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="拖动到此处删除"
+            android:textColor="@color/c_white"
+            android:textSize="10dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

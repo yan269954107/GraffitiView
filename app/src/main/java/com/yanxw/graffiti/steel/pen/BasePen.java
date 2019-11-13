@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.yanxw.graffiti.CollectionsUtil;
-import com.yanxw.graffiti.newversion.AnnotationInterface;
 import com.yanxw.graffiti.newversion.ConvertXY;
 import com.yanxw.graffiti.steel.config.ControllerPoint;
 import com.yanxw.graffiti.steel.config.PenConfig;
@@ -30,12 +29,12 @@ public abstract class BasePen {
      */
     public static final int STEP_FACTOR = 20;
     public static final float WIDTH_FACTOR = 8.0f;
-    public static LinkedList<PointsPath> sHWPointsList = new LinkedList<>();
+    private float sMinWidth = 0.5f;
+    private  LinkedList<PointsPath> mHWPointsList = new LinkedList<>();
     protected ArrayList<ControllerPoint> mHWPointList = new ArrayList<>();
     protected ArrayList<ControllerPoint> mHWPointCurrent = new ArrayList<>();
     protected ControllerPoint mLastPoint = new ControllerPoint(0, 0);
     protected Paint mPaint;
-    protected AnnotationInterface mAnnotationInterface;
 
     protected RectF mPointBounds = null;
 
@@ -58,25 +57,25 @@ public abstract class BasePen {
         mBaseWidth = paint.getStrokeWidth();
     }
 
-    public void setAnnotationInterface(AnnotationInterface annotationInterface) {
-        mAnnotationInterface = annotationInterface;
-    }
-
     public void setConvertXY(ConvertXY convertXY) {
         mConvertXY = convertXY;
     }
 
     public void setPointsList(LinkedList<PointsPath> pointsList, Canvas canvas) {
-        sHWPointsList = pointsList;
-        drawStack(sHWPointsList, canvas, false);
+        mHWPointsList = pointsList;
+        drawStack(mHWPointsList, canvas, false);
     }
 
     public void setPointStack(LinkedList<PointsPath> pointList) {
-        sHWPointsList = pointList;
+        mHWPointsList = pointList;
     }
 
     public void clearPointsStack() {
-        sHWPointsList.clear();
+        mHWPointsList.clear();
+    }
+
+    public void setMinWidth(float minWidth) {
+        sMinWidth = minWidth;
     }
 
     public void draw(Canvas canvas) {
@@ -191,7 +190,7 @@ public abstract class BasePen {
         if (mHWPointList.size() <= 1) {
             return;
         }
-        sHWPointsList.push(new PointsPath(mHWPointList, mPaint.getColor()));
+        mHWPointsList.push(new PointsPath(mHWPointList, mPaint.getColor()));
     }
 
     /**
@@ -205,8 +204,8 @@ public abstract class BasePen {
 //        Log.d("tag", "@@@@ 2 vfac:" + vfac + " factor:" + factor + " Math.log(factor * 2.0f):" + Math.log(factor * 2.0f));
         double calWidth = mBaseWidth * Math.exp(vfac);
 //        Log.d("tag", "@@@@ 3 calWidth:" + calWidth + " mBaseWidth:" + mBaseWidth + " Math.exp(vfac):" + Math.exp(vfac));
-        if (calWidth < 0.5) {
-            calWidth = 0.5;
+        if (calWidth < sMinWidth) {
+            calWidth = sMinWidth;
         }
         return calWidth;
     }
@@ -215,10 +214,10 @@ public abstract class BasePen {
      * 清除缓存的触摸点
      */
     public void clear() {
-        for (PointsPath pointsPath : sHWPointsList) {
+        for (PointsPath pointsPath : mHWPointsList) {
             pointsPath.setClean(true);
         }
-//        sHWPointsList.clear();
+//        mHWPointsList.clear();
         mHWPointList.clear();
         mHWPointCurrent.clear();
     }
@@ -262,8 +261,8 @@ public abstract class BasePen {
     }
 
     public void undo(Canvas bitmapCanvas, boolean isPop) {
-        if (isPop && sHWPointsList.size() > 0) {
-            for (PointsPath pointsPath : sHWPointsList) {
+        if (isPop && mHWPointsList.size() > 0) {
+            for (PointsPath pointsPath : mHWPointsList) {
                 if (!pointsPath.isClean()) {
                     pointsPath.setClean(true);
                     break;
@@ -271,7 +270,7 @@ public abstract class BasePen {
             }
         }
         mHWPointCurrent.clear();
-        drawStack(sHWPointsList, bitmapCanvas, false);
+        drawStack(mHWPointsList, bitmapCanvas, false);
     }
 
     public void drawStack(LinkedList<PointsPath> pointsStack, Canvas canvas, boolean needCalculate) {
@@ -310,5 +309,9 @@ public abstract class BasePen {
                 mPointBounds.bottom = controllerPoint.getBottom();
             }
         }
+    }
+
+    public LinkedList<PointsPath> getHWPointsList() {
+        return mHWPointsList;
     }
 }
